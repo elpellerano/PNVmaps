@@ -57,14 +57,13 @@ CP.nn <- train(form=biome00k.fm,
 CP.nn
 ## 0.43
 CP.kn <- train(form=biome00k.fm, 
-               data=rm.biome.s[complete.cases(rm.biome[,all.vars(biome00k.fm)]),], 
-               method="kknn", preProc=c("center","scale"), trControl=tc, na.action=na.omit) ### Change: rm.biome zu rm.biome s.(error in tutoial script, they confused the variable name)
+               data=rm.biome.s[complete.cases(rm.biome.s[,all.vars(biome00k.fm)]),], 
+               method="kknn", preProc=c("center","scale"), trControl=tc, na.action=na.omit) ### Change: rm.biome to rm.biome s.(error in tutoial script, they confused the variable name)
 CP.kn
 ## 0.51
 stopCluster(cl)
 closeAllConnections()
 biome.results <- resamples(list(ranger=CP.rf, kknn=CP.kn, gbm=CP.gb, nnet=CP.nn))
-pdf(file="/data/PNV/img/Fig_boxplot_biomes_accuracy.pdf", width=7, height=5)
 bwplot(biome.results, fill="grey")
 dev.off()
 
@@ -91,6 +90,8 @@ attr(biome1km$predictions, "dimnames")[[2]]
 
 grid1km$cool.mixed.forest <- biome1km$predictions[, 
                                                   which(attr(biome1km$predictions, "dimnames")[[2]] == "cool.mixed.forest")]
+
+library(terra)
 # Extrahiere die Daten für 'cool.mixed.forest'
 cool_mixed_forest_raster <- rast(grid1km["cool.mixed.forest"])
 
@@ -130,6 +131,7 @@ cv.biome.SP <- resample(learner = learner.rf,
                         task = spatial.task.biome, 
                         resampling = resampling, 
                         measures = list(acc, wkappa))
+cv.biome.SP
 ## Aggregated Result of Author to compare: acc.test.mean=0.3319514,wkappa.test.mean=0.4548447
 
 
@@ -158,7 +160,7 @@ print(t(data.frame(xl2.P[order(unlist(xl2.P), decreasing=TRUE)[1:20]])))
 # generate Predictions for our Map section in Europa
 pred_FAPAR(i="T9998", gm=m.FAPAR, tile.tbl=tile.tbl) ### Error, predesigned function from Hengl et al., suspecting crossdependency on rgdal
 
-#creating 12 maps for each months to show photosyntatically active radiation (function is not using own predictions, but prefactured ones)
+#creating 12 maps for each months to show photosyntatically active radiation (function is not using own predictions, but prefactured images)
 grid1km.F <- list.files("tiled/T9998/", 
                         pattern=glob2rx("FAPAR_*_M_T9998.tif$"), 
                         full.names=TRUE)
@@ -166,3 +168,4 @@ m.lst <- c("Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Ju
 m.n <- sapply(m.lst, function(i){grep(i, grid1km.F)})
 spplot(as(raster::stack(grid1km.F[m.n]), "SpatialGridDataFrame"), layout=c(6,2),
        names.attr=m.lst)
+
