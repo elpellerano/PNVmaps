@@ -97,7 +97,7 @@ cool_mixed_forest_raster <- rast(grid1km["cool.mixed.forest"])
 
 # GeoTIFF-Datei speichern
 writeRaster(cool_mixed_forest_raster, 
-            filename = "Biome00k_M_cool.mixed.forest_T9998.tif", 
+            filename = "seminar24/output/Biome00k_M_cool.mixed.forest_T9998.tif", 
             filetype = "GTiff", 
             overwrite = TRUE)
 
