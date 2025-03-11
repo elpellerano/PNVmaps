@@ -20,20 +20,24 @@ bio1<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_01.tif")
 bio2<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_02.tif")
 bio3<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_03.tif")
 bio4<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_04.tif")
-bio5<-rast("seminar24/data/CHELSEA/bio/CHELSEA_bio10_05.tif")
+bio5<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_05.tif")
 bio6<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_06.tif")
 bio7<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_07.tif")
-bio8<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_08.tif")
-bio9<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_09.tif")
+#bio8<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_08.tif")
+#bio9<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_09.tif")
 bio10<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_10.tif")
 bio11<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_11.tif")
 bio12<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_12.tif")
 bio13<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_13.tif")
 bio14<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_14.tif")
-bio15<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_15.tif")
+#bio15<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_15.tif")
 bio16<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_16.tif")
 bio17<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_17.tif")
-bio18<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_18.tif")
+#bio18<-rast("seminar24/data/CHELSEA/bio/CHELSA_bio10_18.tif")
+
+
+
+
 ##### Temperature #####
 
 tmean1 <- rast("seminar24/data/CHELSEA/tmean/CHELSA_temp10_01_1979-2013_V1.2_land.tif")
@@ -105,57 +109,21 @@ prec12<-rast("seminar24/data/CHELSEA/prec/CHELSA_prec_12_V1.2_land.tif")
 
 
 
-#### MODIS CLoud coverage #####
-
-cloudcov1<-rast("seminar24/data/MODIS/MODCF_monthlymean_01.tif")
-cloudcov2<-rast("seminar24/data/MODIS/MODCF_monthlymean_02.tif")
-cloudcov3<-rast("seminar24/data/MODIS/MODCF_monthlymean_03.tif")
-cloudcov4<-rast("seminar24/data/MODIS/MODCF_monthlymean_04.tif")
-cloudcov5<-rast("seminar24/data/MODIS/MODCF_monthlymean_05.tif")
-cloudcov6<-rast("seminar24/data/MODIS/MODCF_monthlymean_06.tif")
-cloudcov7<-rast("seminar24/data/MODIS/MODCF_monthlymean_07.tif")
-cloudcov8<-rast("seminar24/data/MODIS/MODCF_monthlymean_08.tif")
-cloudcov9<-rast("seminar24/data/MODIS/MODCF_monthlymean_09.tif")
-cloudcov10<-rast("seminar24/data/MODIS/MODCF_monthlymean_10.tif")
-cloudcov11<-rast("seminar24/data/MODIS/MODCF_monthlymean_11.tif")
-cloudcov12<-rast("seminar24/data/MODIS/MODCF_monthlymean_12.tif")
 
 
-# the chelsea and modis cloud coverage are already on the same grid 
-res(bio1)
-ext(bio1)
-dim(bio1)
-crs(bio1)
+#### DEM ######
 
-res(tmin1)
-ext(tmin1)
-dim(tmin1)
-crs(tmin1)
+bio_stack <- rast(list(bio1, bio2, bio3, bio4, bio5, bio6, 
+                       bio7, bio10, bio11, bio12, bio13, bio14, bio16, bio17))
+tmin_stack <- rast(list(tmin1, tmin2, tmin3, tmin4, tmin5, tmin6, 
+                        tmin7, tmin8, tmin9, tmin10, tmin11, tmin12))
+tmax_stack <- rast(list(tmax1, tmax2, tmax3, tmax4, tmax5, tmax6, 
+                        tmax7, tmax8, tmax9, tmax10, tmax11, tmax12))
+tmean_stack <- rast(list(tmean1, tmean2, tmean3, tmean4, tmean5, tmean6, 
+                         tmean7, tmean8, tmean9, tmean10, tmean11, tmean12))
+prec_stack <- rast(list(prec1, prec2, prec3, prec4, prec5, prec6,
+                        prec7, prec8, prec9, prec10, prec11, prec12))
 
-res(cloudcov1)
-ext(cloudcov1)
-dim(cloudcov1)
-crs(cloudcov1)
-plot(bio1)
-
-
-
-#####Cropping to the iberic region #####
-e <- ext(-10, 5, 36, 51)  # xmin, xmax, ymin, ymax
-
-# Crop the raster to this extent
-bio1_ib <- crop(bio1, e)
-
-# Plot to check the result
-plot(bio1_ib)
-
-#### dem #####
-
-
-library(RSAGA)
-rsa.env <- rsaga.env()
-
-
-df <- as.data.frame(bio1, xy = TRUE)
+cov_stack_chelsea<-rast(list(bio_stack,tmin_stack,tmax_stack,tmean_stack,prec_stack))
 
 
