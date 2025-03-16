@@ -31,7 +31,7 @@ Biome6000_vect <- vect(coords, type = "points", crs = "+proj=longlat +datum=WGS8
 values(Biome6000_vect) <- Biome6000@data
 
 # For each cell, determine the index (i.e., which class) has the highest probability.
-hard_class <- which.max(raster_stack)
+hard_class <- which.max(predictions)
 
 # Extract the predicted class (hard classification) at the point locations 
 
