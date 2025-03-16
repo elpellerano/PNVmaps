@@ -56,4 +56,3 @@ print(conf_mat)
 tpr_values <- conf_mat$byClass[,"Sensitivity"]
 print(tpr_values)
 
-write.csv(extracted_probs, "extracted_probs.csv", row.names = FALSE)
