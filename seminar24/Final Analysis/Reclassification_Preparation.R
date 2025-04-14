@@ -10,7 +10,7 @@ library(forcats)
 
 #reclassiing biomes with too few observations into similiar classes or removing 
 #those with less than 5 
-
+table(data_c$Biome.6000.Consolidated.Name)
 data_c <- data %>%
   filter(!Biome.6000.Consolidated.Name %in% c("wet.sclerophyll.forest", "cool.grassland", "temperate.xerophytic.woods/scrub")) %>%
   mutate(Biome.6000.Consolidated.Name = droplevels(Biome.6000.Consolidated.Name)) %>%
@@ -22,6 +22,7 @@ data_c <- data %>%
                                                     "cool.temperate.rainforest"=c("cool.temperate.rainforest", "warm.temperate.rainforest")
                                                    
   ))
+
 
 
 
@@ -89,7 +90,7 @@ colnames(extr_dem)[4]<-"tpi"
 
 #joining the datasets
 data_cn <- cbind(data_cn, extr_dem, extr_chels)
-
+colnames(data_cn)
 
 ####Model fitting#####
 library(caret)
@@ -168,6 +169,7 @@ table(df_nc$Biome.6000.Cons)
 
 form<-create_model_formula(df_nc, "Biome.6000.Cons", c("Site.Name", "Latitude", "Longitude"))
 df_nc_mod<-prepare_model_dataset(df_nc, "Biome.6000.Cons", c("Site.Name", "Latitude", "Longitude"))
+write.csv(df_nc_mod, "model_data.csv", row.names = FALSE)
 
 colnames(df_nc_mod)
 

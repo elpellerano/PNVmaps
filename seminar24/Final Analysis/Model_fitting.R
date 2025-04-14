@@ -4,7 +4,6 @@ library(caret)
 library(doParallel)
 
 
-
 # Function to automatically create a model formula
 create_model_formula <- function(data, 
                                  target_col, 
@@ -66,17 +65,18 @@ prepare_model_dataset <- function(data,
 df_nc <- na.omit(data_cn)
 
 #preparing data for model fit, factors and column names
-names(df_nc) <- substr(make.names(names(df_nc)), 1, 15)
-df_nc$Biome.6000.Cons<-droplevels(df_nc$Biome.6000.Cons)
-df_nc$Biome.6000.Cons<-as.factor(df_nc$Biome.6000.Cons)
-levels(df_nc_mod$Biome.6000.Cons) <- make.names(levels(df_nc_mod$Biome.6000.Cons))
-
-form<-create_model_formula(df_nc, "Biome.6000.Cons", c("Site.Name", "Latitude", "Longitude"))
-df_nc_mod<-prepare_model_dataset(df_nc, "Biome.6000.Cons", c("Site.Name", "Latitude", "Longitude"))
+names(df_nc) <- substr(make.names(names(df_nc)), 1, 20)
+colnames(df_nc)[2]<- "Biome.6000.Consolidated.Name"
+df_nc$Biome.6000.Consolidated.Name<-droplevels(df_nc$Biome.6000.Consolidated.Name)
+df_nc$Biome.6000.Consolidated.Name<-as.factor(df_nc$Biome.6000.Consolidated.Name)
 
 
+form<-create_model_formula(df_nc, "Biome.6000.Consolidated.Name", c("Site.Name", "Latitude", "Longitude"))
+df_nc_mod<-prepare_model_dataset(df_nc, "Biome.6000.Consolidated.Name", c("Site.Name", "Latitude", "Longitude"))
+table(df_nc_mod$Biome.6000.Consolidated.Name)
+levels(df_nc_mod$Biome.6000.Consolidated.Name) <- make.names(levels(df_nc_mod$Biome.6000.Consolidated.Name))
 #parallelizing 
-cl <- makeCluster(10)
+cl <- makeCluster(6)
 registerDoParallel(cl)
 
 
@@ -88,7 +88,7 @@ tc <- trainControl(method = "repeatedcv",
                    verboseIter = TRUE)
 
 # hyperparameter tuning
-tg <- expand.grid(mtry = seq(5, 15, by = 2), 
+tg <- expand.grid(mtry = seq(5, 13, by = 2), 
                   splitrule = c("gini"), 
                   min.node.size = 10)# min.node.size
 
@@ -109,8 +109,6 @@ best_min_node_size <- rf_model$bestTune$min.node.size
 num_trees <- 500
 
 
-
-
 # Finales Model with probabilities, parameters from cross validation
 rf_model_prob <- ranger(
   form, 
@@ -126,15 +124,7 @@ rf_model_prob <- ranger(
 stopCluster(cl)
 closeAllConnections()
 
-probabilities <- predict(rf_model_prob, data = covariate_matrix)$predictions
 
-# Feature Importance (own ranger function)
-importance_values <- importance(rf_model_prob)
-
-
-print(rf_model_prob)
-print("Feature Importance:")
-print(importance_values)
 
 # save models
 saveRDS(rf_model, "rf_model_fin.rds")
@@ -143,15 +133,33 @@ saveRDS(rf_model_prob, "rf_model_prob_fin.rds")
 
 # save raster stack (40gb or so)
 
-writeRaster(raster_stack, "raster_stack.tif", overwrite = TRUE)
 
-preds <- predict(rf_model_prob, df_nc_mod)
+
+preds <- predict(rf_model_prob_fin, df_nc_mod)
 #preds_cl <- as.factor(apply(preds$predictions, 1, which.max))
 preds_cl <- as.factor(apply(preds$predictions, 1, function(x) colnames(preds$predictions)[which.max(x)]))
 levels(preds_cl)
 levels(df_nc_mod$Biome.6000.Cons)
 conf_mat <- confusionMatrix(as.factor(preds_cl), df_nc_mod$Biome.6000.Cons)
 tpr<- conf_mat$byClass[,"Sensitivity"]
+
 summary(rf_model2)
+
+
+freq<-table(df_nc_mod$Biome.6000.Cons)
+names(freq)<-c()
+Table2<-cbind("Biome Class" = names(tpr),tpr,freq)
+rownames(Table2)<-NULL
+Table2[,1] <- gsub("^.{7}", "", Table2[,1])  # Remove the first 7 characters
+Table2[,1] <- gsub("\\.", " ", Table2[,1])  # Replace periods with spaces
+Table2[,1] <- tools::toTitleCase(Table2[,1])
+Table2[,2]<- substr(Table2[,2], 1, 6)
+colnames(Table2)<-c("Biome Class","TPR","Frequency")
+ write.csv(Table2, "Table2.csv", row.names = FALSE)
+
+Table2
 rf_model_fin
 table(df_nc_mod$Biome.6000.Cons)
+
+rf_model_fin
+rf_model

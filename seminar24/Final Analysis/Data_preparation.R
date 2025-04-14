@@ -8,7 +8,7 @@ library(sf)
 
 # Read the CSV file
 data <- read.csv("https://researchdata.reading.ac.uk/99/1/BIOME%206000%20DB%20classified%20plotfile_v1.csv")
-
+table(data$Biome.6000.Consolidated.Name)
 # Ensure proper column names 
 colnames(data) <- c("Target.age..ka.", "Site.Name", "Latitude", "Longitude", "Biome.6000.Consolidated.Name", "Biome.6000.biome.code", "Biome.4.2.Biome.6000.common.biomes", "MegaBiomes..Scheme.2.", "BIOME.4.2.names.from.model.code", "Biome.4.2.code", "BIOME4.2.BIOME.6000.equivalencies")
 
@@ -133,6 +133,3 @@ prec_stack <- rast(list(prec1, prec2, prec3, prec4, prec5, prec6,
                         prec7, prec8, prec9, prec10, prec11, prec12))
 
 cov_stack_chelsea<-rast(list(bio_stack,tmin_stack,tmax_stack,tmean_stack,prec_stack))
-
-
-
