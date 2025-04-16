@@ -90,7 +90,7 @@ tc <- trainControl(method = "repeatedcv",
 # hyperparameter tuning
 tg <- expand.grid(mtry = seq(5, 13, by = 2), 
                   splitrule = c("gini"), 
-                  min.node.size = 10)# min.node.size
+                  min.node.size = c(5,10,15))# min.node.size
 
 # training with  Cross-Validation (Caret)
 rf_model <- train(
@@ -103,9 +103,10 @@ rf_model <- train(
   na.action = na.omit
 )
 
+
 # Parameters after Cross-Validation (mtry 20, nod size 10, 500 trees)
-best_mtry <- rf_model$bestTune$mtry
-best_min_node_size <- rf_model$bestTune$min.node.size
+best_mtry <- rf_model_fin$bestTune$mtry
+best_min_node_size <- rf_model_fin$bestTune$min.node.size
 num_trees <- 500
 
 
@@ -124,12 +125,12 @@ rf_model_prob <- ranger(
 stopCluster(cl)
 closeAllConnections()
 
-
+rf_model
 
 # save models
 saveRDS(rf_model, "rf_model_fin.rds")
 
-saveRDS(rf_model_prob, "rf_model_prob_fin.rds")
+saveRDS(rf_model_prob, "rf_model_prob_fin2.rds")
 
 # save raster stack (40gb or so)
 

@@ -133,3 +133,4 @@ prec_stack <- rast(list(prec1, prec2, prec3, prec4, prec5, prec6,
                         prec7, prec8, prec9, prec10, prec11, prec12))
 
 cov_stack_chelsea<-rast(list(bio_stack,tmin_stack,tmax_stack,tmean_stack,prec_stack))
+
